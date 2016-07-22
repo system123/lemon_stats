@@ -1,3 +1,3 @@
-module LemonStats
+class LemonStats
   VERSION = "0.1.0"
 end

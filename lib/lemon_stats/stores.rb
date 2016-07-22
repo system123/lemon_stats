@@ -1,0 +1,5 @@
+require 'lemon_stats/stores/stats_store'
+require 'lemon_stats/stores/store_collection'
+require 'lemon_stats/stores/redis_store'
+require 'lemon_stats/stores/statsd_store'
+require 'lemon_stats/stores/log_store'

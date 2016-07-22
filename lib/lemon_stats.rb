@@ -3,45 +3,74 @@ require "lemon_stats/version"
 %w(
   stores
   types
-  stats_group
+  stats_collection
+  exceptions
 ).each { |f| require "lemon_stats/#{f}" }
 
 class LemonStats
-  	attr_accessor :store_collection
-	attr_accessor :stats_group
-	attr_accessor :base_key
 
-	def intialize(base_endpoint)
+  	attr_accessor :store_collection
+  	attr_accessor :stats_collection
+	attr_accessor :base_group
+	attr_accessor :base_key
+	attr_reader   :mutex
+
+	def initialize(base_endpoint)
 		@base_key = base_endpoint
+		@stats_collection = LemonStats::StatsCollection.new
 		@store_collection = LemonStats::StoreCollection.new @base_key
-		@stats_group = LemonStats::StatsGroup.new @base_key, @store_collection
 	end
 
 	def add_store(store)
 		@store_collection.add store
 	end
 
+	def find_store(id)
+		@store_collection.find_by_id id
+	end
+
 	def remove_store(store)
 		@store_collection.remove store
 	end
 
-	def add_stats_group(group)
-		@stats_group.add_sub_group group
+	def add_stat(stat)
+		@stats_collection << stat
 	end
 
-	def remove_stats_group(group)
-		@stats_group.remove_sub_group group
+	def get_stat(name, group=nil)
+		@stats_collection.get name, group
 	end
 
-	def find_group_by_name(group)
-
+	def remove_stat(stat)
+		@stats_collection.remove stat
 	end
 
-	def add_stat(stat, key)
-
+	def get_stats_group(group)
+		@stats_collection[group]
 	end
 
-	def remove_stat(stat, key)
-
+	def update_stat(name, group, value)
+		stat = @stats_collection.get name, group
+		stat.update value
+		@store_collection.save_stats [stat] if stat.dirty
 	end
+
+	def update_stats(gid, &block)
+		group = @stats_collection.get_group_as_collection gid
+		group.instance_eval &block
+		@store_collection.save_stats group.get_dirty
+	end
+
+	def update_stat_at(key, value)
+		name, gid = key_to_name_group key
+		update_stat name, gid, value
+	end
+
+	private
+
+	def key_to_name_group(key)
+		parts = key.rpartition(':')
+		return parts.last, parts.first
+	end
+
 end
