@@ -40,7 +40,8 @@ describe LemonStats do
 		end
 
 		it 'Remove a stats store' do
-			expect(subject.remove_store(@test)).to eq(@test)			
+			expect(subject.remove_store(@test)).to eq(@test)
+			expect(subject.find_store("main")).to eq(nil)		
 		end
 	end
 
@@ -63,6 +64,10 @@ describe LemonStats do
 
 		it 'Get stats by group' do
 		
+		end
+
+		it 'Get stats group by regex' do
+
 		end
 
 		it 'Update a stat' do

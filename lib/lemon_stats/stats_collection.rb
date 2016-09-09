@@ -23,12 +23,18 @@ class LemonStats
 
 		def add(stat)
 			@stats[stat.group] = [] unless has_group? stat.group
-			@stats[stat.group] << stat
+
+			@mutex.synchronize do
+				@stats[stat.group] << stat
+			end
 		end
 
 		def remove(stat)
 			group = get_group stat.group
-			group.values.delete stat if group
+			
+			@mutex.synchronize do
+				group.values.delete stat if group
+			end
 		end
 
 		def remove!(stat)

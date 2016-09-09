@@ -112,7 +112,7 @@ class LemonStats
 		end
 
 		def updated_bound_stat(stat)
-			val = stat.value #Default tot taking the value of the stat which changed
+			val = stat.value #Default to take the value of the stat which changed
 
 			if @aggregator
 				val = @aggregator.call( stat, @bound_stats )
