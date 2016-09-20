@@ -35,6 +35,15 @@ class LemonStats
 
 	def add_stat(stat)
 		@stats_collection << stat
+		save_dirty_stats
+	end
+
+	def stats?
+		@stats_collection.length
+	end
+
+	def stats
+		@stats_collection.clone[nil]
 	end
 
 	def get_stat(name, group=nil)
@@ -52,18 +61,22 @@ class LemonStats
 	def update_stat(name, group, value)
 		stat = @stats_collection.get name, group
 		stat.update value
-		@store_collection.save_stats [stat] if stat.dirty
+		save_dirty_stats
 	end
 
 	def update_stats(gid, &block)
 		group = @stats_collection.get_group_as_collection gid
 		group.instance_eval &block
-		@store_collection.save_stats group.get_dirty
+		save_dirty_stats
 	end
 
 	def update_stat_at(key, value)
 		name, gid = key_to_name_group key
 		update_stat name, gid, value
+	end
+
+	def save_dirty_stats
+		@store_collection.save_stats @stats_collection.get_dirty
 	end
 
 	private

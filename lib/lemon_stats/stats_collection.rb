@@ -1,6 +1,8 @@
 class LemonStats
 #TODO Add locking and thread safety
 	class StatsCollection
+	    # include Celluloid
+	    
 		attr_accessor :stats
 		attr_reader :mutex
 
@@ -23,6 +25,7 @@ class LemonStats
 
 		def add(stat)
 			@stats[stat.group] = [] unless has_group? stat.group
+			raise LemonStats::Error, "Stat #{stat.name} in #{stat.group} already exists." if has_stat?(stat.name, stat.group)
 
 			@mutex.synchronize do
 				@stats[stat.group] << stat
@@ -61,11 +64,17 @@ class LemonStats
 		end
 
 		def get_group(gid)
+			group = nil
 			if gid.is_a?(Regexp)
-				get_group_by_pattern gid
+				group = get_group_by_pattern gid
 			else
-				get_group_by_name gid
+				group = get_group_by_name gid
 			end
+			group
+		end
+
+		def length
+			get_group_by_name(nil).length
 		end
 
 		def get_group!(gid)
@@ -84,7 +93,7 @@ class LemonStats
 
 		def get_dirty(gid = nil)
 			group = get_group gid
-			group.values.flatten.select { |v| v.dirty == true }
+			group.select { |v| v.dirty == true }
 		end
 
 		def has_group?(gid)
@@ -93,6 +102,11 @@ class LemonStats
 			else
 				@stats.has_key? gid
 			end
+		end
+
+		def has_stat?(name, gid=nil)
+			stats = @stats.values.flatten.find { |v| ( v.name == name ) && (v.group == gid || gid.nil?) }
+			!stats.nil?
 		end
 
 		def update(name, val)
@@ -116,7 +130,6 @@ class LemonStats
 		def get_group_by_pattern(gid_regex)
 			@stats.select{ |k,v| k =~ gid_regex }
 		end
-
 
 	end
 

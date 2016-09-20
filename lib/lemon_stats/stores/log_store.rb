@@ -11,18 +11,21 @@ class LemonStats
 		end
 
 		def save_stat(stat)
-			check_file_open
+			check_file_open?
 			write_file fmt_log(stat, "#{stat.value}")
+			true
 		end
 
 		def remove_stat(stat)
-			check_file_open
+			check_file_open?
 			write_file fmt_log(stat, "Removed")
+			true
 		end
 
 		def clear_stat(stat)
-			check_file_open
+			check_file_open?
 			write_file fmt_log(stat, "#{stat.value} Cleared")
+			true
 		end
 
 		def close

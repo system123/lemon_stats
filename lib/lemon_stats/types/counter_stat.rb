@@ -6,11 +6,13 @@ class  LemonStats
 		end
 
 		def update(val = nil)
-			super(@value + val)
+			self.set_value(val) do |current_val|
+				current_val + val
+			end
 		end
 
 		def clear
-			@value = 0
+			self.set_value(0)
 		end
 
 		alias_method :increment, :update

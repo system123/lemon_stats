@@ -6,11 +6,11 @@ class LemonStats
 		end
 
 		def update(val = nil)
-			super(val)
+			self.set_value val
 		end
 
 		def clear
-			@value = 0
+			self.set_value(0)
 		end
 
 	end

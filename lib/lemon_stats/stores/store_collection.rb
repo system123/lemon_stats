@@ -1,5 +1,7 @@
 class LemonStats
 	class StoreCollection
+	    # include Celluloid
+
 		attr_accessor :stats_stores
 		attr_accessor :base_store_key
 		attr_accessor :mutex
@@ -35,7 +37,7 @@ class LemonStats
 
 		def save_stats(stats=[])
 			@mutex.synchronize do
-				@stats_stores.each do |store|
+				@stats_stores.each do |id, store|
 					store.save_stats stats
 				end
 			end
@@ -43,7 +45,7 @@ class LemonStats
 
 		def remove_stats(stats=[])
 			@mutex.synchronize do
-				@stats_stores.each do |store|
+				@stats_stores.each do |id, store|
 					store.remove_stats stats
 				end
 			end

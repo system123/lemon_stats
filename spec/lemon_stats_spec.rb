@@ -16,8 +16,6 @@ describe LemonStats do
 	context "Stats store collection" do
 		before(:each) do
 			@test = instance_spy("LemonStats::StatsStore", "TestStore", :type => :test_store, :id => "main")
-			allow(@test).to receive(:save_stats).and_return(true)
-			allow(@test).to receive(:save_stat).and_return(true)
 			subject.add_store(@test)
 		end
 
@@ -32,8 +30,6 @@ describe LemonStats do
 
 		it 'Add another stat store' do
 			ss2 = instance_spy("LemonStats::StatsStore", "AnotherStore", :type => :test_store, :id => "test2")
-			allow(ss2).to receive(:save_stats).and_return(true)
-			allow(ss2).to receive(:save_stat).and_return(true)
 			subject.add_store(ss2)
 
 			expect(subject.find_store("test2")).to eq(ss2)
@@ -45,16 +41,30 @@ describe LemonStats do
 		end
 	end
 
-	it 'Add, Get and Remove a stat' do
+	context "Stats collection" do
+		before(:each) do
+			@stat1 = instance_spy("LemonStats::BaseStat", "StatOne", :name => "total", :group => "g1:g2", :type => :count, :value => 0)
+			subject.add_stat @stat1
+		end
 
-	end
+		it 'Add a stat' do
+			expect(subject.stats?).to eq(1)
+		end
 
-	it 'Try get a non-existant stat' do
+		it 'Add duplicate stat' do
+			expect{subject.add_stat @stat1}.to raise_error(LemonStats::Error)
+		end
 
-	end
+		it 'Get a stat' do
+		end
 
-	it 'Try remove a non existant stat' do
+		it 'Remove a stat' do
 
+		end
+
+		it 'Remove non existant stat' do
+
+		end
 	end
 
 	context "After adding stats" do
